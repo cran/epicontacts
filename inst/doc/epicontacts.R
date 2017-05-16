@@ -60,7 +60,7 @@ fisher.test(get_pairwise(merskor15, "sex", f=table))
 
 ## ---- get_clusters-------------------------------------------------------
 x <- make_epicontacts(ebola_sim$linelist, ebola_sim$contacts,
-                      id = "case.id", to = "case.id", from = "infector",
+                      id = "case_id", to = "case_id", from = "infector",
                       directed = TRUE)
 x
 
