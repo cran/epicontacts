@@ -45,7 +45,11 @@ subset(merskor15, cs_min = 10, cs_max = 100)
 plot(merskor15) 
 
 ## ------------------------------------------------------------------------
-graph3D(merskor15, group = "sex", g_title = "MERS Korea 2014")
+plot(merskor15, "place_infect", node_shape = "sex",
+     shapes = c(M = "male", F = "female")) 
+
+## ------------------------------------------------------------------------
+graph3D(merskor15, node_color = "sex", g_title = "MERS Korea 2014")
 
 ## ------------------------------------------------------------------------
 si <- get_pairwise(merskor15, "dt_onset")   

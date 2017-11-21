@@ -4,30 +4,53 @@
 \alias{vis_epicontacts}
 \title{Plot epicontacts objects using visNetwork}
 \usage{
-vis_epicontacts(x, group = "id", annot = TRUE, legend = TRUE,
-  legend_max = 10, col_pal = cases_pal, NA_col = "lightgrey",
+vis_epicontacts(x, node_color = "id", label = "id", annot = TRUE,
+  node_shape = NULL, shapes = NULL, edge_label = NULL,
+  edge_color = NULL, legend = TRUE, legend_max = 10,
+  col_pal = cases_pal, NA_col = "lightgrey", edge_col_pal = edges_pal,
   width = "90\%", height = "700px", selector = TRUE, editor = FALSE,
   edge_width = 3, ...)
 }
 \arguments{
 \item{x}{An \code{\link{epicontacts}} object.}
 
-\item{group}{An index or character string indicating which field of the
+\item{node_color}{An index or character string indicating which field of the
 linelist should be used to color the nodes.}
+
+\item{label}{An index, logical, or character string indicating which fields
+of the linelist should be used for labelling the nodes. Logical will be
+recycled if necessary, so that the default \code{TRUE} effectively uses all
+columns of the linelist.}
 
 \item{annot}{An index, logical, or character string indicating which fields
 of the linelist should be used for annotating the nodes. Logical will be
 recycled if necessary, so that the default \code{TRUE} effectively uses all
 columns of the linelist.}
 
+\item{node_shape}{An index or character string indicating which field of the
+linelist should be used to determine the shapes of the nodes.}
+
+\item{shapes}{A named vector of characters indicating which icon code should
+be used for each value \code{node_shape}, e.g. \code{c(m = "male", f =
+"female")} if 'm' amd 'f' are values from \code{node_shape}. See
+\code{\link{codeawesome}} for all available codes.}
+
+\item{edge_label}{An index or character string indicating which field of the
+contacts data should be used to label the edges of the graph.}
+
+\item{edge_color}{An index or character string indicating which field of the
+contacts data should be used to color the edges of the graph.}
+
 \item{legend}{A logical indicating whether a legend should be added to the
 plot.}
 
 \item{legend_max}{The maximum number of groups for a legend to be displayed.}
 
-\item{col_pal}{A color palette for the groups.}
+\item{col_pal}{A color palette for the nodes.}
 
 \item{NA_col}{The color used for unknown group.}
+
+\item{edge_col_pal}{A color palette for the edges.}
 
 \item{width}{The width of the output, in html compatible format (e.g. '90\%'
 or '800px').}
@@ -67,8 +90,13 @@ x <- make_epicontacts(linelist=mers_korea_2015[[1]],
 
 \dontrun{
 plot(x)
-plot(x, group = "place_infect")
-plot(x, group = "loc_hosp", legend_max=20, annot=TRUE)
+plot(x, node_color = "place_infect")
+plot(x, node_color = "loc_hosp", legend_max=20, annot=TRUE)
+plot(x, "place_infect", node_shape = "sex",
+     shapes = c(M = "male", F = "female"))
+
+plot(x, "sex", node_shape = "sex", shapes = c(F = "female", M = "male"),
+     edge_label = "exposure", edge_color = "exposure")
 }
 }
 }

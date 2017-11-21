@@ -13,13 +13,32 @@
 #'
 #' @param x An \code{\link{epicontacts}} object.
 #'
-#' @param group An index or character string indicating which field of the
+#' @param node_color An index or character string indicating which field of the
 #'     linelist should be used to color the nodes.
 #'
 #' @param annot An index, logical, or character string indicating which fields
 #'   of the linelist should be used for annotating the nodes. Logical will be
 #'   recycled if necessary, so that the default \code{TRUE} effectively uses all
 #'   columns of the linelist.
+#'
+#' @param node_shape An index or character string indicating which field of the
+#'   linelist should be used to determine the shapes of the nodes.
+#'
+#' @param shapes A named vector of characters indicating which icon code should
+#'   be used for each value \code{node_shape}, e.g. \code{c(m = "male", f =
+#'   "female")} if 'm' amd 'f' are values from \code{node_shape}. See
+#'   \code{\link{codeawesome}} for all available codes.
+#'
+#' @param label An index, logical, or character string indicating which fields
+#'   of the linelist should be used for labelling the nodes. Logical will be
+#'   recycled if necessary, so that the default \code{TRUE} effectively uses all
+#'   columns of the linelist.
+#'
+#' @param edge_label An index or character string indicating which field of the
+#'   contacts data should be used to label the edges of the graph.
+#'
+#' @param edge_color An index or character string indicating which field of the
+#'   contacts data should be used to color the edges of the graph.
 #'
 #' @param edge_width An integer indicating the width of the edges. Defaults to
 #'   3.
@@ -29,7 +48,9 @@
 #'
 #' @param legend_max The maximum number of groups for a legend to be displayed.
 #'
-#' @param col_pal A color palette for the groups.
+#' @param col_pal A color palette for the nodes.
+#'
+#' @param edge_col_pal A color palette for the edges.
 #'
 #' @param NA_col The color used for unknown group.
 #'
@@ -67,14 +88,23 @@
 #'
 #' \dontrun{
 #' plot(x)
-#' plot(x, group = "place_infect")
-#' plot(x, group = "loc_hosp", legend_max=20, annot=TRUE)
+#' plot(x, node_color = "place_infect")
+#' plot(x, node_color = "loc_hosp", legend_max=20, annot=TRUE)
+#' plot(x, "place_infect", node_shape = "sex",
+#'      shapes = c(M = "male", F = "female"))
+#'
+#' plot(x, "sex", node_shape = "sex", shapes = c(F = "female", M = "male"),
+#'      edge_label = "exposure", edge_color = "exposure")
 #' }
 #' }
 
-vis_epicontacts <- function(x, group = "id", annot  =  TRUE,
+vis_epicontacts <- function(x, node_color = "id",
+                            label = "id", annot  =  TRUE,
+                            node_shape = NULL, shapes = NULL,
+                            edge_label = NULL, edge_color = NULL,
                             legend = TRUE, legend_max = 10,
                             col_pal = cases_pal, NA_col = "lightgrey",
+                            edge_col_pal = edges_pal,
                             width = "90%", height = "700px",
                             selector = TRUE, editor = FALSE,
                             edge_width = 3, ...){
@@ -86,50 +116,38 @@ vis_epicontacts <- function(x, group = "id", annot  =  TRUE,
   ## code).
 
 
-  ## check group (node attribute used for color)
-  if (length(group) > 1L) {
-    stop("'group' must indicate a single node attribute")
-  }
-  if (is.logical(group) && !group) {
-    group <- NULL
-  }
-  if (!is.null(group)) {
-    if (is.numeric(group)) {
-      group <- names(x$linelist)[group]
-    }
+  ## check node_color (node attribute used for color)
+  node_color <- assert_node_color(x, node_color)
 
-    if (!group %in% names(x$linelist)) {
-      msg <- sprintf("Group '%s' is not in the linelist", group)
-      stop(msg)
-    }
-  }
-
+  ## check node_shape (node attribute used for color)
+  node_shape <- assert_node_shape(x, node_shape)
 
   ## check annot (txt displayed when clicking on node)
-  if (is.logical(annot) && sum(annot) == 0L) {
-    annot <- NULL
-  }
-  if (!is.null(annot)) {
-    if (is.numeric(annot) || is.logical(annot)) {
-      annot <- names(x$linelist)[annot]
-    }
+  annot <- assert_annot(x, annot)
 
-    if (!all(annot %in% names(x$linelist))) {
-      culprits <- annot[!annot %in% names(x$linelist)]
-      culprits <- paste(culprits, collapse = ", ")
-      msg <- sprintf("Annot '%s' is not in the linelist", culprits)
-      stop(msg)
-    }
-  }
+  ## check node_color (node attribute used for color)
+  edge_label <- assert_edge_label(x, edge_label)
+
+  ## check node_color (node attribute used for color)
+  edge_color <- assert_edge_color(x, edge_color)
 
 
   ## make a list of all nodes, and generate a data.frame of node attributes
-
   nodes <- data.frame(id = unique(c(x$linelist$id,
                                     x$contacts$from,
-                                    x$contacts$to)))
-  nodes <- suppressMessages(
-    suppressWarnings(dplyr::left_join(nodes, x$linelist)))
+                                    x$contacts$to)),
+                      stringsAsFactors = FALSE)
+
+  nodes <- merge(nodes, x$linelist, by = "id", all = TRUE)
+
+
+  ## generate annotations ('title' in visNetwork terms)
+
+  if (!is.null(label)) {
+    labels <- apply(nodes[, label, drop = FALSE], 1,
+                    paste, collapse = "\n")
+    nodes$label <- labels
+  }
 
 
   ## generate annotations ('title' in visNetwork terms)
@@ -144,45 +162,99 @@ vis_epicontacts <- function(x, group = "id", annot  =  TRUE,
   }
 
 
-  ## add node color ('group') and label
+  ## add node color ('group')
 
-  nodes$label <- nodes$id
-
-  if (!is.null(group)) {
-    nodes$group <- as.character(nodes[, group])
-    nodes$group[is.na(nodes$group)] <- "NA"
-    nodes$group <- factor(nodes$group)
+  if (!is.null(node_color)) {
+    node_col_info <- fac2col(factor(nodes[, node_color]),
+                             col_pal,
+                             NA_col,
+                             legend = TRUE)
+    K <- length(node_col_info$leg_lab)
+    nodes$group.color <- nodes$icon.color <- node_col_info$color
   }
 
-  ## add edge info
 
+  ## add shape info
+
+  if (!is.null(node_shape)) {
+    if (is.null(shapes)) {
+      msg <- paste("'shapes' needed if 'node_shape' provided;",
+                   "to see codes, node_shape: codeawesome")
+      stop(msg)
+    }
+    vec_node_shapes <- as.character(unlist(nodes[node_shape]))
+    shapes["NA"] <- "question-circle"
+    unknown_codes <- !shapes %in% names(codeawesome)
+    if (any(unknown_codes)) {
+      culprits <- paste(shapes[unknown_codes],
+                        collapse = ", ")
+      msg <- sprintf("unknown icon codes: %s \nto see 'codeawesome'",
+                     culprits)
+      stop(msg)
+    }
+
+    vec_node_shapes <- paste(vec_node_shapes)
+    node_code <- codeawesome[shapes[vec_node_shapes]]
+    nodes$shape <- "icon"
+    nodes$icon.code <- node_code
+  } else {
+    nodes$borderWidth <- 2
+  }
+  
+  ## add edge info
   edges <- x$contacts
+  edges$width <- edge_width
   if (x$directed) {
     edges$arrows <- "to"
   }
 
+  if (!is.null(edge_label)) {
+    edges$label <- edges[, edge_label]
+  }
 
-  ## buil visNetwork output
+
+  if (!is.null(edge_color)) {
+    edge_col_info <- fac2col(factor(edges[, edge_color]),
+                             edge_col_pal,
+                             NA_col,
+                             legend = TRUE)
+    L <- length(edge_col_info$leg_lab)
+    edges$color <- edge_col_info$color
+  }
+
+
+  ## build visNetwork output
 
   out <- visNetwork::visNetwork(nodes, edges,
-                                width = width, height = height, ...)
+                                width = width,
+                                height = height, ...)
 
 
   ## specify group colors, add legend
 
-  if (!is.null(group)) {
-    K <- length(unique(nodes$group))
-    grp_col <- col_pal(K)
-    grp_col[levels(nodes$group) == "NA"] <- NA_col
-
-    for (i in seq_len(K)) {
-      out <- out %>% visNetwork::visGroups(groupname = levels(nodes$group)[i],
-                                           color = grp_col[i])
+  if (legend) {
+    if (!is.null(node_color) &&  (K < legend_max)) {
+      leg_nodes <- data.frame(label = node_col_info$leg_lab,
+                              color = node_col_info$leg_col,
+                              shape = "box",
+                              shadow = TRUE,
+                              font.size = 20)
+    } else {
+      leg_nodes <- NULL
     }
 
-    if (legend && (K < legend_max)) {
-      out <- out %>% visNetwork::visLegend()
+    if (!is.null(edge_color) &&  (L < legend_max)) {
+      leg_edges <- data.frame(label = edge_col_info$leg_lab,
+                              color = edge_col_info$leg_col,
+                              font.size = 15)
+    } else {
+      leg_edges <- NULL
     }
+
+    out <- out %>% visNetwork::visLegend(addNodes = leg_nodes,
+                                         addEdges = leg_edges,
+                                         useGroups = FALSE)
+
   }
 
 
@@ -191,15 +263,19 @@ vis_epicontacts <- function(x, group = "id", annot  =  TRUE,
   ## set nodes borders, edge width, and plotting options
 
   enabled <- list(enabled = TRUE)
-  arg_selec <- if (selector) group else NULL
+  arg_selec <- if (selector) node_color else NULL
 
-
-  out <- out %>% visNetwork::visNodes(borderWidth = 2)  %>%
-    visNetwork::visEdges(width = edge_width) %>%
+  out <- out %>%
     visNetwork::visOptions(highlightNearest = TRUE) %>%
     visNetwork::visOptions(selectedBy = arg_selec,
                            manipulation = editor,
-                           highlightNearest = enabled)
-
+                           highlightNearest = enabled) %>%
+    visNetwork::visPhysics(stabilization = FALSE)
+  
+  # add fontAwesome
+  out <-
+    out %>%
+    visNetwork::addFontAwesome()
+  
   return(out)
 }

@@ -1,6 +1,6 @@
 context("3D Graph")
 
-test_that("graph3D produces json that is not null", {
+test_that("graph3D produces list that is not null", {
 
   skip_on_cran()
 
@@ -9,9 +9,9 @@ test_that("graph3D produces json that is not null", {
     directed=TRUE)
 
   g <- graph3D(x)
-  expect_is(g$x, "json")
-  expect_gt(length(g$x), 0)
-
+  expect_is(g, "scatterplotThree")
+  expect_is(g, "htmlwidget")
+  expect_is(g$x, "list")
 
 })
 
@@ -27,25 +27,25 @@ test_that("graph3D errors as expected on bad annotation and group specification"
   expect_error(graph3D(x, annot = c("id", "toto", "caca")),
                msg)
 
-  msg <- "Group 'foobar' is not in the linelist"
-  expect_error(graph3D(x, group = "foobar"),
+  msg <- "node_color 'foobar' is not in the linelist"
+  expect_error(graph3D(x, node_color = "foobar"),
                msg)
 
-  msg <- "'group' must indicate a single node attribute"
-  expect_error(graph3D(x, group = c(1:3)), msg)
+  msg <- "'node_color' must indicate a single node attribute"
+  expect_error(graph3D(x, node_color = c(1:3)), msg)
 
 
-  expect_equal(graph3D(x, group = NULL),
-               graph3D(x, group = FALSE))
+  expect_equal(graph3D(x, node_color = NULL)$x$color,
+               graph3D(x, node_color = FALSE)$x$color)
 
-  expect_equal(graph3D(x, group = 1),
-               graph3D(x, group = "id"))
+  expect_equal(graph3D(x, node_color = 1)$x$color,
+               graph3D(x, node_color = "id")$x$color)
 
-  expect_equal(graph3D(x, annot = NULL),
-               graph3D(x, annot = FALSE))
+  expect_equal(graph3D(x, annot = NULL)$x$labels,
+               graph3D(x, annot = FALSE)$x$labels)
 
-  expect_equal(graph3D(x, annot = 1:2),
-               graph3D(x, annot = c("id","generation")))
+  expect_equal(graph3D(x, annot = 1:2)$x$labels,
+               graph3D(x, annot = c("id","generation"))$x$labels)
 
 })
 
@@ -58,6 +58,6 @@ test_that("graph3D object includes annotation", {
                         directed=TRUE)
 
   g <- graph3D(x, annot = c("date_of_infection", "outcome"))
-  expect_true(grepl("date_of_infection", g$x))
+  expect_true(all(grepl("date_of_infection", g$x$labels)))
 
 })

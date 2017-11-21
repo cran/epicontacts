@@ -1,7 +1,7 @@
 Package: epicontacts
 Type: Package
 Title: Handling, Visualisation and Analysis of Epidemiological Contacts
-Version: 1.0.1
+Version: 1.1.0
 Date: 2017-05-11
 Authors@R: c(person("VP", "Nagraj", email = "vpnagraj@virginia.edu", role = c("aut", "cre")),
        	     person("Thibaut", "Jombart", email = "thibautjombart@gmail.com", role = c("aut")),
@@ -12,7 +12,7 @@ Authors@R: c(person("VP", "Nagraj", email = "vpnagraj@virginia.edu", role = c("a
 Description: A collection of tools for representing epidemiological contact data, composed of case line lists and contacts between cases. Also contains procedures for data handling, interactive graphics, and statistics.
 License: GPL (>= 2)
 LazyData: TRUE
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000
 Imports: grDevices, dplyr, igraph, magrittr, visNetwork, threejs,
         colorspace
 Suggests: outbreaks, testthat, covr, shiny, readr, knitr, rmarkdown
@@ -20,7 +20,7 @@ VignetteBuilder: knitr
 URL: http://www.repidemicsconsortium.org/epicontacts/
 BugReports: http://github.com/reconhub/epicontacts/issues
 NeedsCompilation: no
-Packaged: 2017-05-16 13:44:36 UTC; vpn7n
+Packaged: 2017-11-20 19:35:40 UTC; vpn7n
 Author: VP Nagraj [aut, cre],
   Thibaut Jombart [aut],
   Nistara Randhawa [aut],
@@ -29,4 +29,4 @@ Author: VP Nagraj [aut, cre],
   Thomas Crellen [aut]
 Maintainer: VP Nagraj <vpnagraj@virginia.edu>
 Repository: CRAN
-Date/Publication: 2017-05-16 13:55:28 UTC
+Date/Publication: 2017-11-21 08:24:53 UTC
