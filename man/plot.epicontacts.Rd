@@ -4,8 +4,13 @@
 \alias{plot.epicontacts}
 \title{Plot epicontacts objects}
 \usage{
-\method{plot}{epicontacts}(x, node_color = "id", method = c("visNetwork",
-  "graph3D"), thin = TRUE, ...)
+\method{plot}{epicontacts}(
+  x,
+  node_color = "id",
+  method = c("visNetwork", "graph3D"),
+  thin = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{An \code{\link{epicontacts}} object}
@@ -16,8 +21,7 @@ in the linelist should be used to color the nodes.}
 \item{method}{A character string indicating the plotting method to be used;
 available values are "visNetwork" and "graph3D"; see details.}
 
-\item{thin}{A logical indicating if the data should be thinned so that only
-cases with contacts should be plotted.}
+\item{thin}{A logical indicating if the data should be thinned with \code{\link{thin}} so that only cases with contacts should be plotted.}
 
 \item{...}{Further arguments passed to the plotting methods.}
 }

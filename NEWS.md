@@ -1,3 +1,24 @@
+epicontacts 1.1.2 (2021-10-19)
+==================
+
+### BUG FIXES
+
+- plotting bug (blank plot) induced by changes to `visNetwork` in `vis_epicontacts()` has been 
+  fixed
+
+
+epicontacts 1.1.1 (2018-9-18)
+==================
+
+### NEW FEATURES
+
+* `vis_epicontacts()` gains an `x_axis` argument to specify a column to use for
+  displaying dates.
+
+### BUG FIXES
+
+- `vis_epicontacts()` and `plot()` now both use same default thinning
+
 epicontacts 1.1.0 (2017-11-20)
 ==================
 
