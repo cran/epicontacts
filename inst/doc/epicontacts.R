@@ -62,7 +62,7 @@ head(get_pairwise(merskor15, "sex"), n = 10)
 get_pairwise(merskor15, "sex", f=table)
 fisher.test(get_pairwise(merskor15, "sex", f=table)) 
 
-## ---- get_clusters------------------------------------------------------------
+## ----get_clusters-------------------------------------------------------------
 x <- make_epicontacts(ebola_sim$linelist, ebola_sim$contacts,
                       id = "case_id", to = "case_id", from = "infector",
                       directed = TRUE)
@@ -78,7 +78,7 @@ barplot(table(clust$cluster_size),
 	ylab = "Frequency")
 
 
-## ---- get_clusters2-----------------------------------------------------------
+## ----get_clusters2------------------------------------------------------------
 
 x <- get_clusters(x)
 x_14 <- subset(x, cs = 14)

@@ -1,3 +1,11 @@
+epicontacts 1.1.4 (2024-04-29)
+==================
+
+### BUG FIXES
+
+- Fix `thin` option for `plot.epicontacts`
+- Deal with duplicated IDs
+
 epicontacts 1.1.3 (2023-03-28)
 ==================
 
@@ -21,7 +29,7 @@ epicontacts 1.1.1 (2018-9-18)
 ### NEW FEATURES
 
 * `vis_epicontacts()` gains an `x_axis` argument to specify a column to use for
-  displaying dates.
+  displaying dates
 
 ### BUG FIXES
 

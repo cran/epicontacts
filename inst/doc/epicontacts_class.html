@@ -12,7 +12,7 @@
 
 <meta name="author" content="VP Nagraj" />
 
-<meta name="date" content="2023-03-28" />
+<meta name="date" content="2024-04-30" />
 
 <title>epicontacts Class: Details Regarding the Data Structure for epicontacts Objects</title>
 
@@ -137,13 +137,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -349,7 +356,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore"><code>epicontacts</code> Class: Details Regarding the Data Structure for <code>epicontacts</code> Objects</h1>
 <h4 class="author">VP Nagraj</h4>
-<h4 class="date">2023-03-28</h4>
+<h4 class="date">2024-04-30</h4>
 
 
 <div id="TOC">
@@ -458,21 +465,21 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ##   // linelist
 ## 
 ## # A tibble: 5,888 x 11
-##    id     generation date_of_i~1 date_of_~2 date_of_~3 date_of_~4 outcome gender
-##    &lt;chr&gt;       &lt;int&gt; &lt;date&gt;      &lt;date&gt;     &lt;date&gt;     &lt;date&gt;     &lt;fct&gt;   &lt;fct&gt; 
-##  1 d1fafd          0 NA          2014-04-07 2014-04-17 2014-04-19 &lt;NA&gt;    f     
-##  2 53371b          1 2014-04-09  2014-04-15 2014-04-20 NA         &lt;NA&gt;    m     
-##  3 f5c3d8          1 2014-04-18  2014-04-21 2014-04-25 2014-04-30 Recover f     
-##  4 6c286a          2 NA          2014-04-27 2014-04-27 2014-05-07 Death   f     
-##  5 0f58c4          2 2014-04-22  2014-04-26 2014-04-29 2014-05-17 Recover f     
-##  6 49731d          0 2014-03-19  2014-04-25 2014-05-02 2014-05-07 &lt;NA&gt;    f     
-##  7 f9149b          3 NA          2014-05-03 2014-05-04 NA         Recover f     
-##  8 881bd4          3 2014-04-26  2014-05-01 2014-05-05 NA         Death   f     
-##  9 e66fa4          2 NA          2014-04-21 2014-05-06 2014-05-12 Recover m     
-## 10 20b688          3 NA          2014-05-05 2014-05-06 2014-05-14 Death   m     
-## # ... with 5,878 more rows, 3 more variables: hospital &lt;fct&gt;, lon &lt;dbl&gt;,
-## #   lat &lt;dbl&gt;, and abbreviated variable names 1: date_of_infection,
-## #   2: date_of_onset, 3: date_of_hospitalisation, 4: date_of_outcome
+##    id     generation date_of_infection date_of_onset date_of_hospitalisation
+##    &lt;chr&gt;       &lt;int&gt; &lt;date&gt;            &lt;date&gt;        &lt;date&gt;                 
+##  1 d1fafd          0 NA                2014-04-07    2014-04-17             
+##  2 53371b          1 2014-04-09        2014-04-15    2014-04-20             
+##  3 f5c3d8          1 2014-04-18        2014-04-21    2014-04-25             
+##  4 6c286a          2 NA                2014-04-27    2014-04-27             
+##  5 0f58c4          2 2014-04-22        2014-04-26    2014-04-29             
+##  6 49731d          0 2014-03-19        2014-04-25    2014-05-02             
+##  7 f9149b          3 NA                2014-05-03    2014-05-04             
+##  8 881bd4          3 2014-04-26        2014-05-01    2014-05-05             
+##  9 e66fa4          2 NA                2014-04-21    2014-05-06             
+## 10 20b688          3 NA                2014-05-05    2014-05-06             
+## # i 5,878 more rows
+## # i 6 more variables: date_of_outcome &lt;date&gt;, outcome &lt;fct&gt;, gender &lt;fct&gt;,
+## #   hospital &lt;fct&gt;, lon &lt;dbl&gt;, lat &lt;dbl&gt;
 ## 
 ##   // contacts
 ## 
@@ -489,7 +496,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ##  8 20b688 d8a13d other  
 ##  9 2ae019 a3c8b8 other  
 ## 10 20b688 974bc1 other  
-## # ... with 3,790 more rows</code></pre>
+## # i 3,790 more rows</code></pre>
 </div>
 <div id="summary.epicontacts" class="section level3">
 <h3><code>summary.epicontacts()</code></h3>
